@@ -6,11 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Globe, Copy, Sparkles, Check } from "lucide-react";
 // TODO: Import shadcn/ui Input, Label, Textarea, Tooltip, Accordion when modularizing
 
 // List of 12 European translations of the Amazon slogan
 const slogans = [
-  { lang: "English", text: "Work Hard, have fun, make history." },
+  { lang: "English", text: "Work hard, have fun, make history." },
   { lang: "French", text: "Travaillez dur, amusez-vous, faites l'histoire." },
   { lang: "German", text: "Arbeite hart, habe Spaß, schreibe Geschichte." },
   { lang: "Spanish", text: "Trabaja duro, diviértete, haz historia." },
@@ -64,6 +65,9 @@ export default function Home() {
   // Store translation results
   type TranslationResult = { locale: string; suggestion: string; translation: string };
   const [results, setResults] = useState<TranslationResult[]>([]);
+
+  // State for copied index
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
   // Cycle through slogans every 2 seconds
   useEffect(() => {
@@ -213,6 +217,12 @@ export default function Home() {
     }, 2700);
   }
 
+  function handleCopy(text: string, idx: number) {
+    navigator.clipboard.writeText(text);
+    setCopiedIdx(idx);
+    setTimeout(() => setCopiedIdx(null), 1500);
+  }
+
   // Render blank state landing page
   if (!started) {
     const valueProp = "Instantly generate high-quality, brand-safe translations for your campaigns.";
@@ -236,11 +246,13 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-row bg-background">
       {/* Left column: Message panel */}
-      <aside className="w-full max-w-xs border-r bg-white min-h-screen flex flex-col p-6 gap-8">
+      <aside className="w-full max-w-xs border-r bg-white min-h-screen flex flex-col p-6 gap-8 sticky top-0 h-screen">
         {/* Heading and Translate button */}
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-lg font-semibold">Message</h2>
-          <Button size="sm" onClick={handleTranslate}>Translate</Button>
+          <Button size="sm" onClick={handleTranslate} disabled={!input.trim()}>
+            Translate
+          </Button>
         </div>
 
         {/* Input section */}
@@ -312,16 +324,31 @@ export default function Home() {
         )}
         {showResults && (
           <div>
-            <h2 className="text-xl font-semibold mb-6">Translations</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <span className="font-semibold text-lg">Suggested Translations</span>
+            </div>
             <div className="grid grid-cols-1 gap-4">
-              {results.map((res) => (
+              {results.map((res, idx) => (
                 <Card key={res.locale} className="shadow-xs">
                   <CardContent className="">
                     <div className="font-semibold mb-2 text-base">{res.locale}</div>
                     <div className="mb-3 text-sm text-muted-foreground">{res.suggestion}</div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="bg-muted px-2 py-1 rounded text-xs">Suggested translation</span>
-                      <span className="font-medium text-sm">{res.translation}</span>
+                    <div className="flex items-center gap-2 mt-2 group relative bg-muted py-1 px-2 rounded-md">
+                      <Sparkles className="w-4 h-4 text-yellow-500" />
+                      <span className="font-medium text-base">{res.translation}</span>
+                      <button
+                        className="opacity-0 group-hover:opacity-100 transition-opacity ml-2"
+                        onClick={() => handleCopy(res.translation, idx)}
+                        title="Copy to clipboard"
+                        type="button"
+                      >
+                        {copiedIdx === idx ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
