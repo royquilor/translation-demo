@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Globe, Copy, Sparkles, Check } from "lucide-react";
+import { Copy, Sparkles, Check } from "lucide-react";
 // TODO: Import shadcn/ui Input, Label, Textarea, Tooltip, Accordion when modularizing
 
 // List of 12 European translations of the Amazon slogan
